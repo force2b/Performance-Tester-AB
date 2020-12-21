@@ -1,0 +1,38 @@
+<template>
+    <lightning-layout horizontal-align="spread" multiple-rows="true">
+        <lightning-layout-item padding="horizontal-small" size="6" small-device-size="1" >
+            <div class="slds-p-horizontal_xx-small slds-m-bottom_x-small">
+                <p><b>{testMode.Label}</b></p>
+            </div>
+        </lightning-layout-item>
+
+        <lightning-layout-item padding="horizontal-small" size="6" small-device-size="2" >
+            <c-platform-cache-performance-test-item
+                label="Test Count"
+                value={testMode.Counter}>
+            </c-platform-cache-performance-test-item>
+        </lightning-layout-item>
+
+        <lightning-layout-item padding="horizontal-small" size="6" small-device-size="3" >
+            <c-platform-cache-performance-test-item
+                label="Average (ms)"
+                min-decimals="3"
+                value={testMode.Average}>
+            </c-platform-cache-performance-test-item>
+        </lightning-layout-item>
+
+        <lightning-layout-item padding="horizontal-small" size="6" small-device-size="2" >
+            <c-platform-cache-performance-test-item
+                label="Low Value"
+                value={testMode.LowVal}>
+            </c-platform-cache-performance-test-item>
+        </lightning-layout-item>
+
+        <lightning-layout-item padding="horizontal-small" size="6" small-device-size="2" >
+            <c-platform-cache-performance-test-item
+                label="High Value"
+                value={testMode.HighVal}>
+            </c-platform-cache-performance-test-item>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>
