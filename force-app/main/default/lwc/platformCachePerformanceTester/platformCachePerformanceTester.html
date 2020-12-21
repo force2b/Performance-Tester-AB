@@ -1,0 +1,39 @@
+<template>
+
+    <div class="slds-m-top_small slds-m-bottom_medium">
+        <lightning-card  variant="Narrow">
+            <p class="slds-p-horizontal_small">
+                <template if:false={testsStarted}>
+                    <lightning-input type="number" name="interval"
+                        value={intervalTimeInSeconds}
+                        onchange={handleIntervalChange}
+                        label="Test Interval (Seconds)" >
+                    </lightning-input>
+                </template>
+                <template if:true={testsStarted}>
+                    <lightning-input type="number" name="interval"
+                        value={intervalTimeInSeconds}
+                        onchange={handleIntervalChange}
+                        label="Test Interval (Seconds)"
+                        disabled>
+                    </lightning-input>
+                </template>
+                <br/>
+            </p>
+            <lightning-button variant="brand" label="Start Testing" title="Start Testing" onclick={handleClickStartButton} class="slds-m-left_x-small" if:false={testsStarted}></lightning-button>
+            <lightning-button variant="destructive-text" label="Stop Testing" title="Stop Testing" onclick={handleClickStopButton} class="slds-m-left_x-small" if:true={testsStarted}></lightning-button>
+        </lightning-card>
+    </div>
+
+    <template if:true={testConfigMetadata}>
+        <template for:each={testConfigMetadata} for:item="test">
+            <c-platform-cache-performance-test-card
+                test-data={test}
+                test-type={test.TestType}
+                key={test.TestType}
+                data-id="test-card"
+                data-type={test.TestType}>
+            </c-platform-cache-performance-test-card>
+        </template>
+    </template>
+</template>
