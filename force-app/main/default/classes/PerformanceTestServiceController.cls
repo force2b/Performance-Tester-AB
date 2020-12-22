@@ -4,31 +4,6 @@ public without sharing class PerformanceTestServiceController {
     private static Long duration = 0;
 
     /**
-     * @description Collection of Tests:
-     * Key:TestName
-     * List[0]: Test Label for UI
-     * List[1]: Test Mode A Label
-     * List[2]: Test Mode B Label
-     */
-    // private static Map<String, Map<String, String>> testConfigMetadata = new Map<String, Map<String, String>>{
-    //     'TriggerHandler' => new Map<String, String>{
-    //         'TestLabel' => 'TDTM TriggerHandler Query',
-    //         'ModeALabel' => 'SOQL',
-    //         'ModeBLabel' => 'PlatformCache'
-    //     },
-    //     'RollupsQuery' => new Map<String, String>{
-    //         'TestLabel' => 'CRLP Custom Metadata Type Query',
-    //         'ModeALabel' => 'SOQL',
-    //         'ModeBLabel' => 'PlatformCache'
-    //     },
-    //     'Describe' => new Map<String, String>{
-    //         'TestLabel' => 'SObject Describe',
-    //         'ModeALabel' => 'Full',
-    //         'ModeBLabel' => 'Partial'
-    //     }
-    // };
-
-    /**
      * @description Returns the full list of Tests
      */
     @AuraEnabled
@@ -41,6 +16,7 @@ public without sharing class PerformanceTestServiceController {
         return JSON.serialize(new List<TestConfiguration>{
             new TestConfiguration('TriggerHandler', 'TDTM TriggerHandler Query', 'SOQL', 'Platform Cache'),
             new TestConfiguration('RollupsQuery', 'CRLP Custom MetadataType Query', 'SOQL', 'Platform Cache'),
+            new TestConfiguration('DataImportMapping', 'Data Import Mapping MetadataType Query', 'SOQL', 'Platform Cache'),
             new TestConfiguration('DescribeTest', 'UTIL_Describe', 'Default', 'Deferred')
         });
     }
@@ -56,17 +32,23 @@ public without sharing class PerformanceTestServiceController {
                 when 'TriggerHandler:A' {
                     triggerHandlerSoql();
                 }
-                when 'RollupsQuery:A' {
-                    rollupCmdtSoql();
-                }
-                when 'DescribeTest:A' {
-                    describeTestA();
-                }
                 when 'TriggerHandler:B' {
                     triggerHandlerCache();
                 }
+                when 'RollupsQuery:A' {
+                    rollupCmdtSoql();
+                }
                 when 'RollupsQuery:B' {
                     rollupCmdtCache();
+                }
+                when 'DataImportMapping:A' {
+                    dataImportMappingsSoql();
+                }
+                when 'DataImportMapping:B' {
+                    dataImportMappingsCache();
+                }
+                when 'DescribeTest:A' {
+                    describeTestA();
                 }
                 when 'DescribeTest:B' {
                     describeTestB();
@@ -187,6 +169,52 @@ public without sharing class PerformanceTestServiceController {
             ];
     }
 
+        /**
+     * @description Query Data_Import_Field_Mapping__mdt using SOQL
+     */
+    private static void dataImportMappingsSoql(){
+        startTime = System.currentTimeMillis();
+        Data_Import_Field_Mapping__mdt[] results = queryDataImportMappings();
+        duration = System.currentTimeMillis() - startTime;
+    }
+
+    /**
+     * @description Query Data_Import_Field_Mapping__mdt using SOQL
+     */
+    private static void dataImportMappingsCache(){
+        startTime = System.currentTimeMillis();
+        UTIL_PlatformCache platformCache = UTIL_PlatformCache.getInstance();
+        if (platformCache.isOrgCacheAvailable) {
+            Data_Import_Field_Mapping__mdt[] results = (List<Data_Import_Field_Mapping__mdt>)platformCache.orgCache.get(
+                DataImportMappingsCache.class, UTIL_PlatformCache.CacheBuilderStubParameter
+            );
+            duration = System.currentTimeMillis() - startTime;
+        } else {
+            duration = -1;
+        }
+    }
+    private static List<Data_Import_Field_Mapping__mdt> queryDataImportMappings() {
+        return [SELECT
+                    Id,
+                    Label,
+                    MasterLabel,
+                    DeveloperName,
+                    Data_Import_Field_Mapping_Set__c,
+                    Data_Import_Field_Mapping_Set__r.Label,
+                    Data_Import_Field_Mapping_Set__r.DeveloperName,
+                    Required__c,
+                    Source_Field_API_Name__c,
+                    Target_Field_API_Name__c,
+                    Target_Object_Mapping__c,
+                    Target_Object_Mapping__r.Object_API_Name__c,
+                    Target_Object_Mapping__r.DeveloperName,
+                    Target_OBject_Mapping__r.Legacy_Data_Import_Object_Name__c,
+                    Target_Object_Mapping__r.MasterLabel,
+                    Is_Deleted__c
+            FROM Data_Import_Field_Mapping__mdt
+            WHERE Is_Deleted__c = false];
+    }
+
     private static void describeTestA() {
 
         startTime = System.currentTimeMillis();
@@ -250,6 +278,12 @@ public without sharing class PerformanceTestServiceController {
     public class RollupMetadataCache implements Cache.CacheBuilder {
         public List<Rollup__mdt> doLoad(String dummyParam) {
             List<Rollup__mdt> r = queryRollupCmdtRecords();
+            return r;
+        }
+    }
+    public class DataImportMappingsCache implements Cache.CacheBuilder {
+        public List<Data_Import_Field_Mapping__mdt> doLoad(String dummyParam) {
+            List<Data_Import_Field_Mapping__mdt> r = queryDataImportMappings();
             return r;
         }
     }
