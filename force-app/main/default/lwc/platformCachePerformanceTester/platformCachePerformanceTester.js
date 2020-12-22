@@ -105,14 +105,14 @@ export default class PlatformCachePerformanceTester extends LightningElement {
         });
         let testModeData = testMode === 'A' ? test.ModeA : test.ModeB;
 
+        this.updateChart(testType, duration, testMode === 'A' ? 0 : 1);
+
         testModeData.TotalDuration += duration;
         testModeData.Counter++;
-        testModeData.Durations.push(duration);
-        testModeData.Average = this.trimmedAverage(testModeData.Durations);
         testModeData.HighVal = (duration > testModeData.HighVal ? duration : testModeData.HighVal);
         testModeData.LowVal = (duration < testModeData.LowVal  || testModeData.LowVal === 0.0 ? duration : testModeData.LowVal);
-
-        this.updateChart(testType, duration, testMode === 'A' ? 0 : 1);
+        testModeData.Durations.push(duration);
+        testModeData.Average = this.trimmedAverage(testModeData.Durations);
     }
 
     /**
@@ -160,16 +160,28 @@ export default class PlatformCachePerformanceTester extends LightningElement {
         if (values.length < 10) {
             return avg;
         }
-        let newValues = [];
-        let maxTrimmedValue = avg * 3;
-        let minTrimmedValue = avg / 3;
+
+        // If the max is over 1000x the min, replace the max with the average value
+        // so that the overall average is a little more logical.
+        let fixedValues = [];
         values.forEach( (v) => {
-            if (v < maxTrimmedValue && v > minTrimmedValue) {
-                newValues.push(v);
+            if (v < min*1000) {
+                fixedValues.push(v);
+            } else {
+                fixedValues.push(avg);
             }
         });
 
-        return this.average(newValues);
+        let trimmedValues = [];
+        let maxTrimmedValue = avg * 3;
+        let minTrimmedValue = avg / 3;
+        fixedValues.forEach( (v) => {
+            if (v < maxTrimmedValue && v > minTrimmedValue) {
+                trimmedValues.push(v);
+            }
+        });
+
+        return this.average(trimmedValues);
     }
 
     /**
