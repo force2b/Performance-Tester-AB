@@ -22,7 +22,6 @@ export default class PlatformCachePerformanceTester extends LightningElement {
         // Retrieve the Map of tests from the apex controller
         getTestConfigMetadata()
         .then(response => {
-            console.log(response);
             if (response) {
                 // console.log('Test Configuration Data:\n' + JSON.stringify(response));
                 this.testConfigMetadata = JSON.parse(response);
@@ -72,11 +71,9 @@ export default class PlatformCachePerformanceTester extends LightningElement {
 
         // Invoke subscribe method of empApi. Pass reference to messageCallback
         subscribe(this.channelName, -1, (response) => {
-                console.log(JSON.stringify(response.data.payload));
                 this.handleCompletedTest(response.data.payload);
             }).then(response => {
                 // Response contains the subscription information on subscribe call
-                console.log('Subscription request sent to: ', JSON.stringify(response.channel));
                 this.subscription = response;
         });
     }
@@ -86,7 +83,6 @@ export default class PlatformCachePerformanceTester extends LightningElement {
      * @param {} event
      */
     handleCompletedTest(event) {
-        console.log('Event Response: ', event.Test_Type__c);
         this.recordTestResult(event.Test_Type__c, event.Test_Mode__c, event.Duration__c);
     }
 
@@ -119,20 +115,32 @@ export default class PlatformCachePerformanceTester extends LightningElement {
      * @description Call the ExecuteTest() method with the test type and test mode. The duration is returned in milliseconds.
      */
     makeApexCalls() {
-        this.testConfigMetadata.forEach((test) => {
-            executeTest({"testName": test.TestType, "mode": "A"} )
-            .then(response => {
-                if (response) {
-                    this.recordTestResult(test.TestType, "A", response);
-                }
-            });
 
-            executeTest({"testName": test.TestType, "mode": "B"} )
-            .then(response => {
-                if (response) {
-                    this.recordTestResult(test.TestType, "B", response);
-                }
-            });
+        this.testConfigMetadata.forEach((test) => {
+            setTimeout(() => {
+                executeTest({"testName": test.TestType, "mode": "A"} )
+                .then(response => {
+                    if (response) {
+                        this.recordTestResult(test.TestType, "A", response);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            }, 50);
+
+
+            setTimeout(() => {
+                executeTest({"testName": test.TestType, "mode": "B"} )
+                .then(response => {
+                    if (response) {
+                        this.recordTestResult(test.TestType, "B", response);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            }, 100);
         });
 
     }
