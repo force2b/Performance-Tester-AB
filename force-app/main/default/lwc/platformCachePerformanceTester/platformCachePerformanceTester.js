@@ -116,33 +116,34 @@ export default class PlatformCachePerformanceTester extends LightningElement {
      */
     makeApexCalls() {
 
+        let counter = 1;
         this.testConfigMetadata.forEach((test) => {
             setTimeout(() => {
                 executeTest({"testName": test.TestType, "mode": "A"} )
-                .then(response => {
-                    if (response) {
-                        this.recordTestResult(test.TestType, "A", response);
+                .then(responseA => {
+
+                    if (responseA) {
+
+                        setTimeout(() => {
+                            executeTest({"testName": test.TestType, "mode": "B"} )
+                            .then(responseB => {
+                                if (responseB) {
+                                    this.recordTestResult(test.TestType, "A", responseA);
+                                    this.recordTestResult(test.TestType, "B", responseB);
+                                }
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            });
+                        });
                     }
+            
                 })
                 .catch((error) => {
                     console.log(error);
                 });
-            }, 50);
-
-
-            setTimeout(() => {
-                executeTest({"testName": test.TestType, "mode": "B"} )
-                .then(response => {
-                    if (response) {
-                        this.recordTestResult(test.TestType, "B", response);
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-            }, 100);
+            }, (100 * counter++));
         });
-
     }
 
     /**
