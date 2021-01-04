@@ -1,9 +1,14 @@
 public inherited sharing class PerformanceTestService {
 
+    /**
+     * @description The API name of the org cache partition to use for testing. This specific partition is part of this repo/folder structure.
+     */
     private static final String CACHE_PARTITION_NAME = 'testing';
 
-    public long duration = 0;
-
+    /**
+     * queryTriggerHandlerRecords Retrieve the Trigger_Handler__c records via SOQL mimicing how it's handled in TDTM
+     * @return   return List<Trigger_Handler__c>
+     */
     public static List<Trigger_Handler__c> queryTriggerHandlerRecords() {
         return [SELECT Asynchronous__c, Class__c, Load_Order__c,
                 Object__c, Active__c, Usernames_to_Exclude__c,
@@ -11,7 +16,10 @@ public inherited sharing class PerformanceTestService {
             FROM Trigger_Handler__c
             ORDER BY Load_Order__c];
     }
-
+    /**
+     * queryTriggerHandlerRecords Retrieve the Rollup_mmdt records via SOQL mimicing how it's handled in CRLP
+     * @return   return List<Rollup__mdt>
+     */
     public static List<Rollup__mdt> queryRollupCmdtRecords() {
         return [SELECT
                     Id,
@@ -39,6 +47,10 @@ public inherited sharing class PerformanceTestService {
             ];
     }
 
+    /**
+     * queryTriggerHandlerRecords Retrieve the Data_Import_Field_Mapping__mdt records via SOQL mimicing how it's handled in Gift Entry
+     * @return   return List<Data_Import_Field_Mapping__mdt>
+     */
     public static List<Data_Import_Field_Mapping__mdt> queryDataImportMappings() {
         return [SELECT
                     Id,
@@ -64,9 +76,9 @@ public inherited sharing class PerformanceTestService {
     private static final String objectName = 'Opportunity';
     private static Map<Schema.SObjectType, Schema.DescribeSObjectResult> objectDescribesByType = new Map<Schema.SObjectType, Schema.DescribeSObjectResult>();
 
-
     /**
-     * @description Simulates the behavior in UTIL_Describe by retrieving the Global Describe first!
+     * @description Describe using the default (full) behavior.
+     * Simulates the behavior in UTIL_Describe by retrieving the Global Describe first!
      */
     public static Schema.DescribeSObjectResult getObjectDescribeFull() {
         Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
@@ -75,6 +87,10 @@ public inherited sharing class PerformanceTestService {
         return objDescribe;
     }
 
+    /**
+     * @description Describe using the recently releaed Deferred behavior.
+     * Simulates the behavior in UTIL_Describe by retrieving the Global Describe first!
+     */
     public static Schema.DescribeSObjectResult getObjectDescribeDeferred() {
         Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
         Schema.DescribeSObjectResult objDescribe = gd.get(objectName).getDescribe(SObjectDescribeOptions.Deferred);

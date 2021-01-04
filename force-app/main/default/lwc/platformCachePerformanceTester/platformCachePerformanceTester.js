@@ -3,7 +3,7 @@ import { subscribe, unsubscribe, onError, setDebugFlag, isEmpEnabled }
     from 'lightning/empApi';
 
 import getTestConfigMetadata from '@salesforce/apex/PerformanceTestServiceController.getTestConfigMetadata';
-import executeTest from '@salesforce/apex/PerformanceTestServiceController.ExecuteTest';
+import executeTest from '@salesforce/apex/PerformanceTestServiceController.executeTest';
 
 
 export default class PlatformCachePerformanceTester extends LightningElement {

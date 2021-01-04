@@ -6,15 +6,20 @@ public without sharing class PerformanceTestServiceController {
     private static PerformanceTestService.CacheUtil platformCache = new PerformanceTestService.CacheUtil();
 
     /**
-     * @description Returns the full list of Tests
+     * @description Returns the full list of Tests. This is called during the LWC page load to return back a structure with the 
+     * tests to be executed. The LWC page will use setInterval() to call the ExecuteTest() method in a loop for each individual test
+     * in mode A & then mode B.
+     * @returns JSON serialized test configuration 
      */
     @AuraEnabled
     public static String getTestConfigMetadata() {
 
-        // Initialize the Cache so they're not counting the cold query time
+        // Initialize the Cache related tests so they're not counting the cold query time
         rollupCmdtCache();
         triggerHandlerCache();
+        dataImportMappingsCache();
 
+        // TestName, Test Label for UI, ModeA Label, ModeB Label
         return JSON.serialize(new List<TestConfiguration>{
             new TestConfiguration('TriggerHandler', 'TDTM TriggerHandler Query', 'SOQL', 'Platform Cache'),
             new TestConfiguration('RollupsQuery', 'CRLP Custom MetadataType Query', 'SOQL', 'Platform Cache'),
@@ -24,10 +29,11 @@ public without sharing class PerformanceTestServiceController {
     }
 
     /**
-     * @description Exposed Method to delegate testing for type mode A
+     * @description Exposed Method to delegate testing for the specified TestName and TestMode
+     * @returns The duration in milliseconds.
      */
     @AuraEnabled
-    public static Double ExecuteTest(String testName, String mode) {
+    public static Double executeTest(String testName, String mode) {
         String testNameAndMode = testName + ':' + mode;
         try {
             switch on testNameAndMode {
@@ -96,7 +102,7 @@ public without sharing class PerformanceTestServiceController {
     }
 
     /**
-     * @description Query TriggerHandler__c using SOQL
+     * @description Query TriggerHandler__c using the Platform Cache
      */
     private static void triggerHandlerCache() {
         startTime = System.currentTimeMillis();
@@ -117,7 +123,7 @@ public without sharing class PerformanceTestServiceController {
     }
 
     /**
-     * @description Query Rollup__mdt using SOQL
+     * @description Query Rollup__mdt using the Platform Cache
      */
     private static void rollupCmdtCache(){
         startTime = System.currentTimeMillis();
@@ -137,7 +143,7 @@ public without sharing class PerformanceTestServiceController {
     }
 
     /**
-     * @description Query Data_Import_Field_Mapping__mdt using SOQL
+     * @description Query Data_Import_Field_Mapping__mdt using the Platform Cache
      */
     private static void dataImportMappingsCache(){
         startTime = System.currentTimeMillis();
