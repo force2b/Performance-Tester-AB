@@ -15,8 +15,10 @@ The `PerformanceTestServiceController` Apex Class is what defines the tests bein
 - It was primariliy built to test certain features that rely on NPSP, however that dependency can be easily removed by changing the tests that execute in the `PerformanceTestServiceController` and `PerformanceTestService` apex classes. 
 
 ## Setup and Configuration (if CCI is used with NPSP)
-1. From the NPSP repo, create a new `dev` scratch org and deploy the NPSP Unpackaged Metadata into a Scratch Org
-   - `cci org scratch dev perftest`
+1. Modify the default `orgs/dev.json` scratch org definition to add the following to the config, which enables Platform Cache in the org:
+   - `"features": [ "PlatformCache" ],`
+1. From the NPSP repo, create a new `dev` scratch org and deploy the NPSP Unpackaged Metadata into a Scratch Org. Note that this extends the expiration date to 14 days to allow for additional testing time. Adjust as needed.
+   - `cci org scratch dev perftest --days 14` 
    - `cci flow run config_qa --org perftest`
 2. Enable RD2 in the scratch org
    - `cci flow run enable_rd2 --org perftest`
@@ -27,9 +29,9 @@ The `PerformanceTestServiceController` Apex Class is what defines the tests bein
 5. Make sure the "Performance Testing" tab is visible to the User. 
 
 ## Setup and Configuration (without or NPSP)
-1. Create a new project for this in Visual Studio Code (or IntelliJ)
+1. Create a new SFDX project for this in Visual Studio Code (or IntelliJ)
 2. Modify the `PerformanceTestServiceController` and `PerformanceTestService` classes locally to remove references to any NPSP custom objects or apex.
-3. Create a new scratch org 
+3. Create a new scratch org using the `config/project-scratch-def.json` definition (this enables Platform Cache in the org)
 4. Push the source into the scratch org
 5. Make sure the "Performance Testing" tab is visible to the User. 
 

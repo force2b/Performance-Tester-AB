@@ -91,29 +91,33 @@ public inherited sharing class PerformanceTestService {
             WHERE Is_Deleted__c = false];
     }
 
-    private static final String objectName = 'Opportunity';
+    private static final List<String> objects =  new List<String> {
+        'Opportunity', 'Contact', 'Account'
+    };
     private static Map<Schema.SObjectType, Schema.DescribeSObjectResult> objectDescribesByType = new Map<Schema.SObjectType, Schema.DescribeSObjectResult>();
 
     /**
      * @description Describe using the default (full) behavior.
      * Simulates the behavior in UTIL_Describe by retrieving the Global Describe first!
      */
-    public static Schema.DescribeSObjectResult getObjectDescribeFull() {
+    public static void getObjectDescribeFull() {
         Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
-        Schema.DescribeSObjectResult objDescribe = gd.get(objectName).getDescribe(SObjectDescribeOptions.Default);
-        objectDescribesByType.put(objDescribe.getSObjectType(), objDescribe);
-        return objDescribe;
+        for (String obj: objects) {
+            Schema.DescribeSObjectResult objDescribe = gd.get(obj).getDescribe(SObjectDescribeOptions.Default);
+            objectDescribesByType.put(objDescribe.getSObjectType(), objDescribe);
+        }
     }
 
     /**
      * @description Describe using the recently releaed Deferred behavior.
      * Simulates the behavior in UTIL_Describe by retrieving the Global Describe first!
      */
-    public static Schema.DescribeSObjectResult getObjectDescribeDeferred() {
+    public static void getObjectDescribeDeferred() {
         Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
-        Schema.DescribeSObjectResult objDescribe = gd.get(objectName).getDescribe(SObjectDescribeOptions.Deferred);
-        objectDescribesByType.put(objDescribe.getSObjectType(), objDescribe);
-        return objDescribe;
+        for (String obj: objects) {
+            Schema.DescribeSObjectResult objDescribe = gd.get(obj).getDescribe(SObjectDescribeOptions.Deferred);
+            objectDescribesByType.put(objDescribe.getSObjectType(), objDescribe);
+        }
     }
 
     // ====================================================================

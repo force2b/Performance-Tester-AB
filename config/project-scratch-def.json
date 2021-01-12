@@ -1,0 +1,29 @@
+{
+  "orgName": "Performance A-B Testing",
+  "edition": "Developer",
+  "hasSampleData": false,
+  "features": [ "PlatformCache" ],
+  "settings": {
+    "orgPreferenceSettings": {
+      "s1DesktopEnabled": true
+    },
+    "userManagementSettings": {
+      "enableNewProfileUI": true
+    },
+    "chatterSettings": {
+      "enableChatter": true
+    },
+    "enhancedNotesSettings": {
+      "enableEnhancedNotes": true
+    },
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    },
+    "languageSettings": {
+      "enableTranslationWorkbench": true
+    },
+    "mobileSettings": {
+      "enableS1EncryptedStoragePref2": false
+    }
+  }
+}
