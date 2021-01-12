@@ -1,7 +1,7 @@
-# Platform Cache Performance Testing Proof of Concept
-_Written by Michael Smith, December 2020_
+# A-B Profiling Test Utility
+_Written by Michael Smith, January 2021_
 
-The `PerformanceTestServiceController` Apex Class is what defines the tests being conducted. The LWC components simply render that data in the UI with charts.
+The `ProfilingTestServiceController` Apex Class is what defines the tests being conducted. The LWC components simply render that data in the UI with charts.
 
 ![Main Image](https://github.com/force2b/Performance-Tester-AB/blob/main/images/PerfTestPage.png)
 
@@ -12,7 +12,7 @@ The `PerformanceTestServiceController` Apex Class is what defines the tests bein
 
 ### NPSP Dependency
 - Using this with NPSP is completely **optional**.
-- It was primariliy built to test certain features that rely on NPSP, however that dependency can be easily removed by changing the tests that execute in the `PerformanceTestServiceController` and `PerformanceTestService` apex classes. 
+- It was primariliy built to test certain features that rely on NPSP, however that dependency can be easily removed by changing the tests that execute in the `ProfilingTestServiceController` and `ProfilingTestService` apex classes. 
 
 ## Setup and Configuration (if CCI is used with NPSP)
 1. Modify the default `orgs/dev.json` scratch org definition to add the following to the config, which enables Platform Cache in the org:
@@ -26,20 +26,18 @@ The `PerformanceTestServiceController` Apex Class is what defines the tests bein
    -  This has to be done manually through NPSP Settings -> System -> Advanced Mapping
 4. Switch to the close of this repo and use SFDX to push this repo into the scratch org
    - `sfdx force:source:push --forceoverwrite -u Cumulus__perftest`
-5. Make sure the "Performance Testing" tab is visible to the User. 
 
 ## Setup and Configuration (without or NPSP)
 1. Create a new SFDX project for this in Visual Studio Code (or IntelliJ)
-2. Modify the `PerformanceTestServiceController` and `PerformanceTestService` classes locally to remove references to any NPSP custom objects or apex.
+2. Modify the `ProfilingTestServiceController` and `ProfilingTestService` classes locally to remove references to any NPSP custom objects or apex.
 3. Create a new scratch org using the `config/project-scratch-def.json` definition (this enables Platform Cache in the org)
 4. Push the source into the scratch org
-5. Make sure the "Performance Testing" tab is visible to the User. 
 
 ## Starting the Tests
 1. Launch the org
-2. Open the "Performance Testing" tab
+2. Open the "Profiling Test" tab
 3. Change the seconds interval as desired. The default is to execute the tests every 30 seconds
 
 ## Creating or Modifiying the Tests
-1. Edit the `PerformanceTestServiceController` and `PerformanceTestService` classes to modify or create new tests as needed.
+1. Edit the `ProfilingTestServiceController` and `ProfilingTestService` classes to modify or create new tests as needed.
 2. Tests only support an A & B mode. It's not possible to have more than just two test modes. If there is a reason to compare more than two variations of logic, create multiple tests to compare

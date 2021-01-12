@@ -2,6 +2,6 @@
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
     <description>Created by Lightning App Builder</description>
     <flexiPage>ProfilingTester</flexiPage>
-    <label>Performance Testing</label>
+    <label>Profiling Test</label>
     <motif>Custom18: Form</motif>
 </CustomTab>
