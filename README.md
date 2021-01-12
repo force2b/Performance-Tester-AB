@@ -3,6 +3,8 @@ _Written by Michael Smith, December 2020_
 
 The `PerformanceTestServiceController` Apex Class is what defines the tests being conducted. The LWC components simply render that data in the UI with charts.
 
+![Main Image](https://github.com/force2b/Performance-Tester-AB/blob/main/images/PerfTestPage.png)
+
 ## Prerequisites:
 1. CCI needs to be installed
 2. Clone the NPSP repo locally
