@@ -14,6 +14,7 @@ export default class PlatformCachePerformanceTester extends LightningElement {
     @track testsStarted = false;
 
     intervalTimeInSeconds = 30 // 30 seconds
+    durationCalcMethod = 'system';
     intervalId;
 
     // Initializes the component
@@ -23,11 +24,7 @@ export default class PlatformCachePerformanceTester extends LightningElement {
         getTestConfigMetadata()
         .then(response => {
             if (response) {
-                // console.log('Test Configuration Data:\n' + JSON.stringify(response));
                 this.testConfigMetadata = JSON.parse(response);
-                // console.log(Object.keys(this.testConfigMetadata));
-                // console.log(this.testConfigMetadata[0]);
-                // this.initializeTestResults();
             }
         })
         .then( () => {
@@ -119,13 +116,13 @@ export default class PlatformCachePerformanceTester extends LightningElement {
         let counter = 1;
         this.testConfigMetadata.forEach((test) => {
             setTimeout(() => {
-                executeTest({"testName": test.TestType, "mode": "A"} )
+                executeTest({"testName": test.TestType, "mode": "A", "durationCalcMethod": this.durationCalcMethod} )
                 .then(responseA => {
 
                     if (responseA) {
 
                         setTimeout(() => {
-                            executeTest({"testName": test.TestType, "mode": "B"} )
+                            executeTest({"testName": test.TestType, "mode": "B", "durationCalcMethod": this.durationCalcMethod} )
                             .then(responseB => {
                                 if (responseB) {
                                     this.recordTestResult(test.TestType, "A", responseA);
@@ -227,6 +224,16 @@ export default class PlatformCachePerformanceTester extends LightningElement {
     updateChart(testType, newValue, series) {
         const card = this.template.querySelectorAll('[data-type="' + testType + '"]')[0];
         card.updateChart(newValue, series);
+    }
+
+    /**
+     * @description The apex controller can calculate and return duration using one of these two methods
+     */
+    get cpuDurationOptions() {
+        return [
+            { label: 'System.currentTimeMillis()', value: 'system' },
+            { label: 'Limit.getCpuTime()', value: 'cpu' }
+        ];
     }
 
 }

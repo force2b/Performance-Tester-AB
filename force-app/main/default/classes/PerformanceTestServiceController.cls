@@ -1,9 +1,31 @@
+/**
+Written January 2021
+Michael Smith
+Salesforce.com
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 public without sharing class PerformanceTestServiceController {
 
-    private static Long startTime;
-    private static Long duration = 0;
-
     private static PerformanceTestService.CacheUtil platformCache = new PerformanceTestService.CacheUtil();
+
+    private static final List<TestConfiguration> testConfig = new List<TestConfiguration>{
+        new TestConfiguration('TriggerHandler', 'TDTM TriggerHandler Query', 'SOQL', 'Platform Cache'),
+        new TestConfiguration('RollupsQuery', 'CRLP Custom MetadataType Query', 'SOQL', 'Platform Cache'),
+        new TestConfiguration('DataImportMapping', 'Data Import Mapping MetadataType Query', 'SOQL', 'Platform Cache'),
+        new TestConfiguration('DescribeTest', 'SObject Describe', 'Default', 'Deferred')
+    };
 
     /**
      * @description Returns the full list of Tests. This is called during the LWC page load to return back a structure with the 
@@ -14,28 +36,29 @@ public without sharing class PerformanceTestServiceController {
     @AuraEnabled
     public static String getTestConfigMetadata() {
 
-        // Initialize the Cache related tests so they're not counting the cold query time
-        rollupCmdtCache();
-        triggerHandlerCache();
-        dataImportMappingsCache();
+        // Run every test once on page load to "warm" the cache 
+        for (TestConfiguration test : testConfig) {
+            executeTest(test.TestType, 'A', 'CPU');
+            executeTest(test.TestType, 'B', 'CPU');
+        }
 
-        // TestName, Test Label for UI, ModeA Label, ModeB Label
-        return JSON.serialize(new List<TestConfiguration>{
-            new TestConfiguration('TriggerHandler', 'TDTM TriggerHandler Query', 'SOQL', 'Platform Cache'),
-            new TestConfiguration('RollupsQuery', 'CRLP Custom MetadataType Query', 'SOQL', 'Platform Cache'),
-            new TestConfiguration('DataImportMapping', 'Data Import Mapping MetadataType Query', 'SOQL', 'Platform Cache'),
-            new TestConfiguration('DescribeTest', 'SObject Describe', 'Default', 'Deferred')
-        });
+        // Return the serialized test configuration to the LWC to render in the UI and use for 
+        return JSON.serialize(testConfig);
     }
 
     /**
      * @description Exposed Method to delegate testing for the specified TestName and TestMode
      * @returns The duration in milliseconds.
+     * @param testName The name of the test as defined in the TestConfiguration item
+     * @param mode A or B
+     * @param durationCalcMethod "cpu" (uses Limits.getCpuTime()) or "system" (uses System.currentTimeMillis())
      */
     @AuraEnabled
-    public static Double executeTest(String testName, String mode) {
+    public static Double executeTest(String testName, String mode, String durationCalcMethod) {    
         String testNameAndMode = testName + ':' + mode;
         try {
+            Long startTime = (durationCalcMethod != 'cpu' ? System.currentTimeMillis() : 0);
+
             switch on testNameAndMode {
                 when 'TriggerHandler:A' {
                     triggerHandlerSoql();
@@ -66,14 +89,14 @@ public without sharing class PerformanceTestServiceController {
                 }
             }
 
+            return (durationCalcMethod == 'cpu' ? Limits.getCpuTime() : System.currentTimeMillis() - startTime);
+
             // Not using platform events because these max out at 10k events per day
             // publishEvent(testName, mode, duration);
 
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
-
-        return duration;
     }
 
     /**
@@ -96,61 +119,48 @@ public without sharing class PerformanceTestServiceController {
      * @description Query TriggerHandler__c using SOQL
      */
     private static void triggerHandlerSoql() {
-        startTime = System.currentTimeMillis();
         Trigger_Handler__c[] results = PerformanceTestService.queryTriggerHandlerRecords();
-        duration = System.currentTimeMillis() - startTime;
     }
 
     /**
      * @description Query TriggerHandler__c using the Platform Cache
      */
     private static void triggerHandlerCache() {
-        startTime = System.currentTimeMillis();
-
         Trigger_Handler__c[] results = (List<Trigger_Handler__c>)platformCache.orgCache.get(
                 PerformanceTestService.TriggerHandlerCache.class, 'dummy'
             );
-        duration = System.currentTimeMillis() - startTime;
     }
 
     /*************************************************************************************************
      * @description Query Rollup__mdt using SOQL
      */
     private static void rollupCmdtSoql(){
-        startTime = System.currentTimeMillis();
         Rollup__mdt[] results = PerformanceTestService.queryRollupCmdtRecords();
-        duration = System.currentTimeMillis() - startTime;
     }
 
     /**
      * @description Query Rollup__mdt using the Platform Cache
      */
     private static void rollupCmdtCache(){
-        startTime = System.currentTimeMillis();
         Rollup__mdt[] results = (List<Rollup__mdt>)platformCache.orgCache.get(
             PerformanceTestService.RollupMetadataCache.class, 'dummy'
         );
-        duration = System.currentTimeMillis() - startTime;
     }
 
     /*************************************************************************************************
      * @description Query Data_Import_Field_Mapping__mdt using SOQL
      */
     private static void dataImportMappingsSoql(){
-        startTime = System.currentTimeMillis();
         Data_Import_Field_Mapping__mdt[] results = PerformanceTestService.queryDataImportMappings();
-        duration = System.currentTimeMillis() - startTime;
     }
 
     /**
      * @description Query Data_Import_Field_Mapping__mdt using the Platform Cache
      */
     private static void dataImportMappingsCache(){
-        startTime = System.currentTimeMillis();
         Data_Import_Field_Mapping__mdt[] results = (List<Data_Import_Field_Mapping__mdt>)platformCache.orgCache.get(
             PerformanceTestService.DataImportMappingsCache.class, 'dummy'
         );
-        duration = System.currentTimeMillis() - startTime;
     }
 
 
@@ -158,19 +168,16 @@ public without sharing class PerformanceTestServiceController {
      * @description Test using SObjectDescribe with the default (full) behavior
      */
     private static void describeTestA() {
-        startTime = System.currentTimeMillis();
         PerformanceTestService.getObjectDescribeFull();
-        duration = System.currentTimeMillis() - startTime;
     }
 
     /**
      * @description Test using SObectDescribe using the new Deferred behavior
      */
     private static void describeTestB() {
-        startTime = System.currentTimeMillis();
         PerformanceTestService.getObjectDescribeDeferred();
-        duration = System.currentTimeMillis() - startTime;
     }
+
 
     // ===========================================================================================
     // Inner Class structure used to pass the full test configuration data back to the LWC page js

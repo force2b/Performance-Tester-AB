@@ -2,24 +2,48 @@
 
     <div class="slds-m-top_small slds-m-bottom_medium">
         <lightning-card  variant="Narrow">
-            <p class="slds-p-horizontal_small">
-                <template if:false={testsStarted}>
-                    <lightning-input type="number" name="interval"
-                        value={intervalTimeInSeconds}
-                        onchange={handleIntervalChange}
-                        label="Test Interval (Seconds)" >
-                    </lightning-input>
-                </template>
-                <template if:true={testsStarted}>
-                    <lightning-input type="number" name="interval"
-                        value={intervalTimeInSeconds}
-                        onchange={handleIntervalChange}
-                        label="Test Interval (Seconds)"
-                        disabled>
-                    </lightning-input>
-                </template>
-                <br/>
-            </p>
+
+            <lightning-layout horizontal-align="spread" multiple-rows="true">
+                <lightning-layout-item padding="horizontal-small" size="6" >
+                    <div class="slds-p-horizontal_xx-small slds-m-bottom_x-small">
+                        <template if:false={testsStarted}>
+                            <lightning-input type="number" name="interval"
+                                value={intervalTimeInSeconds}
+                                onchange={handleIntervalChange}
+                                label="Test Interval (Seconds)" >
+                            </lightning-input>
+                        </template>
+                        <template if:true={testsStarted}>
+                            <lightning-input type="number" name="interval"
+                                value={intervalTimeInSeconds}
+                                onchange={handleIntervalChange}
+                                label="Test Interval (Seconds)"
+                                disabled>
+                            </lightning-input>
+                        </template>
+                            </div>
+                </lightning-layout-item>
+
+                <lightning-layout-item padding="horizontal-small" size="6">
+                    <div class="slds-p-horizontal_xx-small slds-m-bottom_x-small">
+                        <template if:false={testsStarted}>
+                            <lightning-combobox type="text" name="mode"
+                                value={durationCalcMethod}
+                                label="Calculate Duration Using"
+                                options={cpuDurationOptions}>
+                            </lightning-combobox>
+                        </template>
+                        <template if:true={testsStarted}>
+                            <lightning-combobox type="text" name="mode"
+                                value={durationCalcMethod}
+                                label="Calculate Duration Using"
+                                options={cpuDurationOptions}
+                                disabled>
+                            </lightning-combobox>
+                        </template>
+                            </div>
+                </lightning-layout-item>
+            </lightning-layout>
             <lightning-button variant="brand" label="Start Testing" title="Start Testing" onclick={handleClickStartButton} class="slds-m-left_x-small" if:false={testsStarted}></lightning-button>
             <lightning-button variant="destructive-text" label="Stop Testing" title="Stop Testing" onclick={handleClickStopButton} class="slds-m-left_x-small" if:true={testsStarted}></lightning-button>
         </lightning-card>
