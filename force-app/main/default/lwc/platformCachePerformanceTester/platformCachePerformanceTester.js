@@ -41,7 +41,7 @@ export default class PlatformCachePerformanceTester extends LightningElement {
      * @param {*} e
      */
     handleClickStartButton(e) {
-        console.log('Starting Interval Timer at ' + this.intervalTimeInSeconds + ' seconds');
+        console.log('Starting Interval Timer at ' + this.intervalTimeInSeconds + ' seconds using the ' + this.durationCalcMethod + ' calculation method');
         this.intervalId = setInterval(() => {
             this.makeApexCalls();
         }, this.intervalTimeInSeconds * 1000);
@@ -54,8 +54,12 @@ export default class PlatformCachePerformanceTester extends LightningElement {
         this.testsStarted = false;
     }
 
+    handleCalculationMethodChange(e) {
+        this.durationCalcMethod = e.target.value;
+    } 
+
     handleIntervalChange(e) {
-        this.intervalTimeInSeconds = e.detail.value;
+        this.intervalTimeInSeconds = e.target.value;
     }
 
     /**

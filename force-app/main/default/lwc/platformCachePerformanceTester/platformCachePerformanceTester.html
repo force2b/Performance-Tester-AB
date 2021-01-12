@@ -30,7 +30,8 @@
                             <lightning-combobox type="text" name="mode"
                                 value={durationCalcMethod}
                                 label="Calculate Duration Using"
-                                options={cpuDurationOptions}>
+                                options={cpuDurationOptions}
+                                onchange={handleCalculationMethodChange}>
                             </lightning-combobox>
                         </template>
                         <template if:true={testsStarted}>
