@@ -1,8 +1,6 @@
 import { LightningElement, api, track } from 'lwc';
 import ChartJS from '@salesforce/resourceUrl/chartjs_v280';
 import { loadScript } from 'lightning/platformResourceLoader';
-// import { nanoid } from 'c/nanoid';
-
 export default class PlatformCachePerformanceTestCard extends LightningElement {
 
     @api testData;
