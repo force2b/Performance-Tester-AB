@@ -1,7 +1,7 @@
 # A-B Profiling Test Utility
 _Written by Michael Smith, January 2021_
 
-The `ProfilingTestServiceController` Apex Class is what defines the tests being conducted. The LWC components simply renders that data in the UI with charts. The [ChartJS library](https://salesforcelabs.github.io/LightningWebChartJS/) is used to render the charts in the UI. In addition to the Apex and LWC's needed to perform and render the test, the repo contains a 3MB cache partition that the apex class usese in the tests.
+The `ProfilingTestServiceController` Apex Class is what defines the tests being conducted. The LWC components simply renders that data in the UI with charts. The [ChartJS library](https://salesforcelabs.github.io/LightningWebChartJS/) is used to render the charts in the UI. In addition to the Apex and LWC's needed to perform and render the test, the repo contains a 3MB cache partition that the apex class uses in the tests.
 
 ![Main Image](https://github.com/force2b/Performance-Tester-AB/blob/main/images/PerfTestPage.png)
 
@@ -27,8 +27,8 @@ The `ProfilingTestServiceController` Apex Class is what defines the tests being 
 4. Switch to the close of this repo and use SFDX to push this repo into the scratch org
    - `sfdx force:source:push --forceoverwrite -u Cumulus__perftest`
 
-## Setup and Configuration (without or NPSP)
-1. Create a new SFDX project for this in Visual Studio Code (or IntelliJ)
+## Setup and Configuration (without NPSP)
+1. After downloading this repo locally, create a new SFDX project for this in Visual Studio Code (or IntelliJ)
 2. Modify the `ProfilingTestServiceController` and `ProfilingTestService` classes locally to remove references to any NPSP custom objects.
 3. Create a new scratch org using the `config/project-scratch-def.json` definition (this enables Platform Cache in the org)
    - `sfdx force:org:create -f config/project-scratch-def.json -a perftest`

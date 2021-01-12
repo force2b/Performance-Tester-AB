@@ -22,6 +22,7 @@ public inherited sharing class ProfilingTestService {
      * @description The API name of the org cache partition to use for testing. This specific partition is part of this repo/folder structure.
      */
     private static final String CACHE_PARTITION_NAME = 'testing';
+    public static ProfilingTestService.CacheUtil platformCache = new ProfilingTestService.CacheUtil();
 
     /**
      * queryTriggerHandlerRecords Retrieve the Trigger_Handler__c records via SOQL mimicing how it's handled in TDTM
@@ -91,34 +92,44 @@ public inherited sharing class ProfilingTestService {
             WHERE Is_Deleted__c = false];
     }
 
-    // Objects to describe
+    // Objects to describe in the tests below
     private static final List<String> objects =  new List<String> {
         'Opportunity', 'Contact', 'Account'
     };
-    private static Map<Schema.SObjectType, Schema.DescribeSObjectResult> objectDescribesByType = new Map<Schema.SObjectType, Schema.DescribeSObjectResult>();
 
     /**
-     * @description Describe using the default (full) behavior.
-     * Simulates the behavior in UTIL_Describe by retrieving the Global Describe first!
+     * @description Call getGlobalDescribe() and then retrieve the SObjectTypes for 3 different objects
+     * Simulates the behavior in NPSP.UTIL_Describe 
      */
-    public static void getObjectDescribeFull() {
+    public static void getGlobalDescribe() {
         Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
-        for (String obj: objects) {
-            Schema.DescribeSObjectResult objDescribe = gd.get(obj).getDescribe(SObjectDescribeOptions.Default);
-            objectDescribesByType.put(objDescribe.getSObjectType(), objDescribe);
+        for (String obj : objects) {
+            SObjectType c = gd.get(obj);
         }
     }
 
     /**
-     * @description Describe using the recently releaed Deferred behavior.
-     * Simulates the behavior in UTIL_Describe by retrieving the Global Describe first!
+     * @description Uses the PlatformCache to retrieve a Set<String> of object Api Names (effectively 
+     * the result of getGlobaDescribe().keySet()) and then uses that to verify that the object is valid; 
+     * and then retrieves the SObjectType for that object dynamically. This could be implemented in the
+     * UTIL_Describe class as a way of avoiding calling getGlobalDescribe() on every transaction where a 
+     * describe is needed, but instead only retrieving the data for specific objects that are referenced.
+     * In some cases, the UTIL_Describe.gd<> map is used just to see if the provided Api name actually exists.
+     * It's also feasible to call the describeSObjects() once for multiple objects rather than one at a 
+     * time as is done here. 
+     * - Note that it's not possible to serialize an SObjectType token which is why the cache isn't used to 
+     *   store the entire result of getGlobalDescribe().
      */
-    public static void getObjectDescribeDeferred() {
-        Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
-        for (String obj: objects) {
-            Schema.DescribeSObjectResult objDescribe = gd.get(obj).getDescribe(SObjectDescribeOptions.Deferred);
-            objectDescribesByType.put(objDescribe.getSObjectType(), objDescribe);
+    public static void getGlobalDescribeCached() {
+        Set<String> gdKeyset = (Set<String>)platformCache.orgCache.get(
+                ProfilingTestService.GlobalDescribeCache.class, 'dummy'
+            );
+        for (String obj : objects) {
+            if (gdKeyset.contains(obj)) {
+                SObjectType c = Schema.describeSObjects(new List<String>{obj})[0].getSobjectType();
+            }
         }
+
     }
 
     // ====================================================================
@@ -153,6 +164,13 @@ public inherited sharing class ProfilingTestService {
     public class DataImportMappingsCache implements Cache.CacheBuilder {
         public List<Data_Import_Field_Mapping__mdt> doLoad(String dummyParam) {
             List<Data_Import_Field_Mapping__mdt> r = queryDataImportMappings();
+            return r;
+        }
+    }
+
+    public class GlobalDescribeCache implements Cache.CacheBuilder {
+        public Set<String> doLoad(String dummyParam) {
+            Set<String> r = Schema.getGlobalDescribe().keySet();
             return r;
         }
     }

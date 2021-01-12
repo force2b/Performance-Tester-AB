@@ -18,13 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 public without sharing class ProfilingTestServiceController {
 
-    private static ProfilingTestService.CacheUtil platformCache = new ProfilingTestService.CacheUtil();
-
+    /** ======================================================================================================================
+     * The actual tests to perform on the page. See the executeTest() method below to link each test to an apex method.
+     * ====================================================================================================================== */
     private static final List<TestConfiguration> testConfig = new List<TestConfiguration>{
         new TestConfiguration('TriggerHandler', 'TDTM TriggerHandler Query', 'SOQL', 'Platform Cache'),
         new TestConfiguration('RollupsQuery', 'CRLP Custom MetadataType Query', 'SOQL', 'Platform Cache'),
         new TestConfiguration('DataImportMapping', 'Data Import Mapping MetadataType Query', 'SOQL', 'Platform Cache'),
-        new TestConfiguration('DescribeTest', 'SObject Describe', 'Default', 'Deferred')
+        new TestConfiguration('GlobalDescribeMap', 'getGlobalDescribe', 'Schema', 'Platform Cache (w/o SObjectType)')
     };
 
     /**
@@ -78,10 +79,10 @@ public without sharing class ProfilingTestServiceController {
                 when 'DataImportMapping:B' {
                     dataImportMappingsCache();
                 }
-                when 'DescribeTest:A' {
+                when 'GlobalDescribeMap:A' {
                     describeTestA();
                 }
-                when 'DescribeTest:B' {
+                when 'GlobalDescribeMap:B' {
                     describeTestB();
                 }
                 when else {
@@ -126,7 +127,7 @@ public without sharing class ProfilingTestServiceController {
      * @description Query TriggerHandler__c using the Platform Cache
      */
     private static void triggerHandlerCache() {
-        SObject[] results = (List<SObject>)platformCache.orgCache.get(
+        SObject[] results = (List<SObject>)ProfilingTestService.platformCache.orgCache.get(
                 ProfilingTestService.TriggerHandlerCache.class, 'dummy'
             );
     }
@@ -142,7 +143,7 @@ public without sharing class ProfilingTestServiceController {
      * @description Query Rollup__mdt using the Platform Cache
      */
     private static void rollupCmdtCache(){
-        SObject[] results = (List<SObject>)platformCache.orgCache.get(
+        SObject[] results = (List<SObject>)ProfilingTestService.platformCache.orgCache.get(
             ProfilingTestService.RollupMetadataCache.class, 'dummy'
         );
     }
@@ -158,7 +159,7 @@ public without sharing class ProfilingTestServiceController {
      * @description Query Data_Import_Field_Mapping__mdt using the Platform Cache
      */
     private static void dataImportMappingsCache(){
-        SObject[] results = (List<SObject>)platformCache.orgCache.get(
+        SObject[] results = (List<SObject>)ProfilingTestService.platformCache.orgCache.get(
             ProfilingTestService.DataImportMappingsCache.class, 'dummy'
         );
     }
@@ -168,14 +169,14 @@ public without sharing class ProfilingTestServiceController {
      * @description Test using SObjectDescribe with the default (full) behavior
      */
     private static void describeTestA() {
-        ProfilingTestService.getObjectDescribeFull();
+        ProfilingTestService.getGlobalDescribe();
     }
 
     /**
      * @description Test using SObectDescribe using the new Deferred behavior
      */
     private static void describeTestB() {
-        ProfilingTestService.getObjectDescribeDeferred();
+        ProfilingTestService.getGlobalDescribeCached();
     }
 
 
