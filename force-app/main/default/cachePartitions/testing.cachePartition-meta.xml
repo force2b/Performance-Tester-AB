@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PlatformCachePartition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Performance Testing Partition</description>
+    <isDefaultPartition>false</isDefaultPartition>
+    <masterLabel>PerformanceTesting</masterLabel>
+    <platformCachePartitionTypes>
+   ​​     <allocatedCapacity>1</allocatedCapacity>
+​​        <allocatedPurchasedCapacity>0</allocatedPurchasedCapacity>
+        <cacheType>Session</cacheType>
+    </platformCachePartitionTypes>
+    <platformCachePartitionTypes>
+    ​​    <allocatedCapacity>2</allocatedCapacity>
+​​        <allocatedPurchasedCapacity>0</allocatedPurchasedCapacity>
+        <cacheType>Organization</cacheType>
+    </platformCachePartitionTypes>​
+</PlatformCachePartition> 

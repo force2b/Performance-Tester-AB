@@ -3,7 +3,7 @@ import { subscribe, unsubscribe, onError, setDebugFlag, isEmpEnabled }
     from 'lightning/empApi';
 
 import getTestConfigMetadata from '@salesforce/apex/PerformanceTestServiceController.getTestConfigMetadata';
-import executeTest from '@salesforce/apex/PerformanceTestServiceController.ExecuteTest';
+import executeTest from '@salesforce/apex/PerformanceTestServiceController.executeTest';
 
 
 export default class PlatformCachePerformanceTester extends LightningElement {
@@ -14,6 +14,7 @@ export default class PlatformCachePerformanceTester extends LightningElement {
     @track testsStarted = false;
 
     intervalTimeInSeconds = 30 // 30 seconds
+    durationCalcMethod = 'system';
     intervalId;
 
     // Initializes the component
@@ -22,13 +23,8 @@ export default class PlatformCachePerformanceTester extends LightningElement {
         // Retrieve the Map of tests from the apex controller
         getTestConfigMetadata()
         .then(response => {
-            console.log(response);
             if (response) {
-                // console.log('Test Configuration Data:\n' + JSON.stringify(response));
                 this.testConfigMetadata = JSON.parse(response);
-                // console.log(Object.keys(this.testConfigMetadata));
-                // console.log(this.testConfigMetadata[0]);
-                // this.initializeTestResults();
             }
         })
         .then( () => {
@@ -45,7 +41,7 @@ export default class PlatformCachePerformanceTester extends LightningElement {
      * @param {*} e
      */
     handleClickStartButton(e) {
-        console.log('Starting Interval Timer at ' + this.intervalTimeInSeconds + ' seconds');
+        console.log('Starting Interval Timer at ' + this.intervalTimeInSeconds + ' seconds using the ' + this.durationCalcMethod + ' calculation method');
         this.intervalId = setInterval(() => {
             this.makeApexCalls();
         }, this.intervalTimeInSeconds * 1000);
@@ -58,8 +54,12 @@ export default class PlatformCachePerformanceTester extends LightningElement {
         this.testsStarted = false;
     }
 
+    handleCalculationMethodChange(e) {
+        this.durationCalcMethod = e.target.value;
+    } 
+
     handleIntervalChange(e) {
-        this.intervalTimeInSeconds = e.detail.value;
+        this.intervalTimeInSeconds = e.target.value;
     }
 
     /**
@@ -72,11 +72,9 @@ export default class PlatformCachePerformanceTester extends LightningElement {
 
         // Invoke subscribe method of empApi. Pass reference to messageCallback
         subscribe(this.channelName, -1, (response) => {
-                console.log(JSON.stringify(response.data.payload));
                 this.handleCompletedTest(response.data.payload);
             }).then(response => {
                 // Response contains the subscription information on subscribe call
-                console.log('Subscription request sent to: ', JSON.stringify(response.channel));
                 this.subscription = response;
         });
     }
@@ -86,7 +84,6 @@ export default class PlatformCachePerformanceTester extends LightningElement {
      * @param {} event
      */
     handleCompletedTest(event) {
-        console.log('Event Response: ', event.Test_Type__c);
         this.recordTestResult(event.Test_Type__c, event.Test_Mode__c, event.Duration__c);
     }
 
@@ -119,22 +116,35 @@ export default class PlatformCachePerformanceTester extends LightningElement {
      * @description Call the ExecuteTest() method with the test type and test mode. The duration is returned in milliseconds.
      */
     makeApexCalls() {
+
+        let counter = 1;
         this.testConfigMetadata.forEach((test) => {
-            executeTest({"testName": test.TestType, "mode": "A"} )
-            .then(response => {
-                if (response) {
-                    this.recordTestResult(test.TestType, "A", response);
-                }
-            });
+            setTimeout(() => {
+                executeTest({"testName": test.TestType, "mode": "A", "durationCalcMethod": this.durationCalcMethod} )
+                .then(responseA => {
 
-            executeTest({"testName": test.TestType, "mode": "B"} )
-            .then(response => {
-                if (response) {
-                    this.recordTestResult(test.TestType, "B", response);
-                }
-            });
+                    if (responseA) {
+
+                        setTimeout(() => {
+                            executeTest({"testName": test.TestType, "mode": "B", "durationCalcMethod": this.durationCalcMethod} )
+                            .then(responseB => {
+                                if (responseB) {
+                                    this.recordTestResult(test.TestType, "A", responseA);
+                                    this.recordTestResult(test.TestType, "B", responseB);
+                                }
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            });
+                        });
+                    }
+            
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            }, (100 * counter++));
         });
-
     }
 
     /**
@@ -218,6 +228,16 @@ export default class PlatformCachePerformanceTester extends LightningElement {
     updateChart(testType, newValue, series) {
         const card = this.template.querySelectorAll('[data-type="' + testType + '"]')[0];
         card.updateChart(newValue, series);
+    }
+
+    /**
+     * @description The apex controller can calculate and return duration using one of these two methods
+     */
+    get cpuDurationOptions() {
+        return [
+            { label: 'System.currentTimeMillis()', value: 'system' },
+            { label: 'Limit.getCpuTime()', value: 'cpu' }
+        ];
     }
 
 }
