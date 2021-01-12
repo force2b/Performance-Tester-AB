@@ -2,12 +2,12 @@ import { LightningElement, track } from 'lwc';
 import { subscribe, unsubscribe, onError, setDebugFlag, isEmpEnabled }
     from 'lightning/empApi';
 
-import getTestConfigMetadata from '@salesforce/apex/PerformanceTestServiceController.getTestConfigMetadata';
-import executeTest from '@salesforce/apex/PerformanceTestServiceController.executeTest';
+import getTestConfigMetadata from '@salesforce/apex/ProfilingTestServiceController.getTestConfigMetadata';
+import executeTest from '@salesforce/apex/ProfilingTestServiceController.executeTest';
 
 
-export default class PlatformCachePerformanceTester extends LightningElement {
-    channelName = '/event/PerformanceTestEvent__e';
+export default class profilingTester extends LightningElement {
+    channelName = '/event/ProfilingTestEvent__e';
     subscription = null;
 
     @track testConfigMetadata = [];

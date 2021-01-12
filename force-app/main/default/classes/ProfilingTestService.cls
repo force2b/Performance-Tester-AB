@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-public inherited sharing class PerformanceTestService {
+public inherited sharing class ProfilingTestService {
 
     /**
      * @description The API name of the org cache partition to use for testing. This specific partition is part of this repo/folder structure.

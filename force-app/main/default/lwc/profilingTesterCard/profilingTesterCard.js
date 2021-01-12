@@ -1,7 +1,8 @@
 import { LightningElement, api, track } from 'lwc';
 import ChartJS from '@salesforce/resourceUrl/chartjs_v280';
 import { loadScript } from 'lightning/platformResourceLoader';
-export default class PlatformCachePerformanceTestCard extends LightningElement {
+
+export default class profilingTesterCard extends LightningElement {
 
     @api testData;
     @api testType;

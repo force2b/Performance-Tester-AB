@@ -52,13 +52,13 @@
 
     <template if:true={testConfigMetadata}>
         <template for:each={testConfigMetadata} for:item="test">
-            <c-platform-cache-performance-test-card
+            <c-profiling-tester-card
                 test-data={test}
                 test-type={test.TestType}
                 key={test.TestType}
                 data-id="test-card"
                 data-type={test.TestType}>
-            </c-platform-cache-performance-test-card>
+            </c-profiling-tester-card>
         </template>
     </template>
 </template>

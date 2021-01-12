@@ -3,13 +3,13 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>platformCachePerformanceTester</componentName>
+                <componentName>profilingTester</componentName>
             </componentInstance>
         </itemInstances>
         <name>main</name>
         <type>Region</type>
     </flexiPageRegions>
-    <masterLabel>Performance Testing</masterLabel>
+    <masterLabel>Profiling Tester</masterLabel>
     <template>
         <name>flexipage:defaultAppHomeTemplate</name>
     </template>

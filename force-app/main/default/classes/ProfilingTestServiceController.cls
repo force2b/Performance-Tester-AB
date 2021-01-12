@@ -16,9 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-public without sharing class PerformanceTestServiceController {
+public without sharing class ProfilingTestServiceController {
 
-    private static PerformanceTestService.CacheUtil platformCache = new PerformanceTestService.CacheUtil();
+    private static ProfilingTestService.CacheUtil platformCache = new ProfilingTestService.CacheUtil();
 
     private static final List<TestConfiguration> testConfig = new List<TestConfiguration>{
         new TestConfiguration('TriggerHandler', 'TDTM TriggerHandler Query', 'SOQL', 'Platform Cache'),
@@ -103,7 +103,7 @@ public without sharing class PerformanceTestServiceController {
      * @description Publish the test completion event
      */
     private static void publishEvent(String testName, String testMode, Long duration) {
-        PerformanceTestEvent__e event = new PerformanceTestEvent__e(
+        ProfilingTestEvent__e event = new ProfilingTestEvent__e(
             Test_Type__c = testName,
             Test_Mode__c = testMode,
             Duration__c = duration
@@ -119,7 +119,7 @@ public without sharing class PerformanceTestServiceController {
      * @description Query TriggerHandler__c using SOQL
      */
     private static void triggerHandlerSoql() {
-        Trigger_Handler__c[] results = PerformanceTestService.queryTriggerHandlerRecords();
+        Trigger_Handler__c[] results = ProfilingTestService.queryTriggerHandlerRecords();
     }
 
     /**
@@ -127,7 +127,7 @@ public without sharing class PerformanceTestServiceController {
      */
     private static void triggerHandlerCache() {
         Trigger_Handler__c[] results = (List<Trigger_Handler__c>)platformCache.orgCache.get(
-                PerformanceTestService.TriggerHandlerCache.class, 'dummy'
+                ProfilingTestService.TriggerHandlerCache.class, 'dummy'
             );
     }
 
@@ -135,7 +135,7 @@ public without sharing class PerformanceTestServiceController {
      * @description Query Rollup__mdt using SOQL
      */
     private static void rollupCmdtSoql(){
-        Rollup__mdt[] results = PerformanceTestService.queryRollupCmdtRecords();
+        Rollup__mdt[] results = ProfilingTestService.queryRollupCmdtRecords();
     }
 
     /**
@@ -143,7 +143,7 @@ public without sharing class PerformanceTestServiceController {
      */
     private static void rollupCmdtCache(){
         Rollup__mdt[] results = (List<Rollup__mdt>)platformCache.orgCache.get(
-            PerformanceTestService.RollupMetadataCache.class, 'dummy'
+            ProfilingTestService.RollupMetadataCache.class, 'dummy'
         );
     }
 
@@ -151,7 +151,7 @@ public without sharing class PerformanceTestServiceController {
      * @description Query Data_Import_Field_Mapping__mdt using SOQL
      */
     private static void dataImportMappingsSoql(){
-        Data_Import_Field_Mapping__mdt[] results = PerformanceTestService.queryDataImportMappings();
+        Data_Import_Field_Mapping__mdt[] results = ProfilingTestService.queryDataImportMappings();
     }
 
     /**
@@ -159,7 +159,7 @@ public without sharing class PerformanceTestServiceController {
      */
     private static void dataImportMappingsCache(){
         Data_Import_Field_Mapping__mdt[] results = (List<Data_Import_Field_Mapping__mdt>)platformCache.orgCache.get(
-            PerformanceTestService.DataImportMappingsCache.class, 'dummy'
+            ProfilingTestService.DataImportMappingsCache.class, 'dummy'
         );
     }
 
@@ -168,14 +168,14 @@ public without sharing class PerformanceTestServiceController {
      * @description Test using SObjectDescribe with the default (full) behavior
      */
     private static void describeTestA() {
-        PerformanceTestService.getObjectDescribeFull();
+        ProfilingTestService.getObjectDescribeFull();
     }
 
     /**
      * @description Test using SObectDescribe using the new Deferred behavior
      */
     private static void describeTestB() {
-        PerformanceTestService.getObjectDescribeDeferred();
+        ProfilingTestService.getObjectDescribeDeferred();
     }
 
 

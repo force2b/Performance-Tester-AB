@@ -1,6 +1,6 @@
 import { LightningElement, api } from 'lwc';
 
-export default class PlatformCachePerformanceTestItem extends LightningElement {
+export default class profilingTesterItem extends LightningElement {
 
     @api value;
     @api label;

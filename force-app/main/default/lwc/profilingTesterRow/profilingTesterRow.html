@@ -7,32 +7,32 @@
         </lightning-layout-item>
 
         <lightning-layout-item padding="horizontal-small" size="6" small-device-size="2" >
-            <c-platform-cache-performance-test-item
+            <c-profiling-tester-item
                 label="Test Count"
                 value={testMode.Counter}>
-            </c-platform-cache-performance-test-item>
+            </c-profiling-tester-item>
         </lightning-layout-item>
 
         <lightning-layout-item padding="horizontal-small" size="6" small-device-size="3" >
-            <c-platform-cache-performance-test-item
+            <c-profiling-tester-item
                 label="Average (ms)"
                 min-decimals="3"
                 value={testMode.Average}>
-            </c-platform-cache-performance-test-item>
+            </c-profiling-tester-item>
         </lightning-layout-item>
 
         <lightning-layout-item padding="horizontal-small" size="6" small-device-size="2" >
-            <c-platform-cache-performance-test-item
+            <c-profiling-tester-item
                 label="Low Value"
                 value={testMode.LowVal}>
-            </c-platform-cache-performance-test-item>
+            </c-profiling-tester-item>
         </lightning-layout-item>
 
         <lightning-layout-item padding="horizontal-small" size="6" small-device-size="2" >
-            <c-platform-cache-performance-test-item
+            <c-profiling-tester-item
                 label="High Value"
                 value={testMode.HighVal}>
-            </c-platform-cache-performance-test-item>
+            </c-profiling-tester-item>
         </lightning-layout-item>
     </lightning-layout>
 </template>
