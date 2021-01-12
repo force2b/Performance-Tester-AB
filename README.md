@@ -1,7 +1,7 @@
 # A-B Profiling Test Utility
 _Written by Michael Smith, January 2021_
 
-The `ProfilingTestServiceController` Apex Class is what defines the tests being conducted. The LWC components simply render that data in the UI with charts.
+The `ProfilingTestServiceController` Apex Class is what defines the tests being conducted. The LWC components simply renders that data in the UI with charts. The [ChartJS library](https://salesforcelabs.github.io/LightningWebChartJS/) is used to render the charts in the UI. In addition to the Apex and LWC's needed to perform and render the test, the repo contains a 3MB cache partition that the apex class usese in the tests.
 
 ![Main Image](https://github.com/force2b/Performance-Tester-AB/blob/main/images/PerfTestPage.png)
 
