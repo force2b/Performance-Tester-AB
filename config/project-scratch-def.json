@@ -4,9 +4,6 @@
   "hasSampleData": false,
   "features": [ "PlatformCache" ],
   "settings": {
-    "orgPreferenceSettings": {
-      "s1DesktopEnabled": true
-    },
     "userManagementSettings": {
       "enableNewProfileUI": true
     },

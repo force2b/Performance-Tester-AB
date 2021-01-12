@@ -25,7 +25,7 @@ public inherited sharing class ProfilingTestService {
 
     /**
      * queryTriggerHandlerRecords Retrieve the Trigger_Handler__c records via SOQL mimicing how it's handled in TDTM
-     * @return   return List<Trigger_Handler__c>
+     * @return  List<Trigger_Handler__c>
      */
     public static List<Trigger_Handler__c> queryTriggerHandlerRecords() {
         return [SELECT Asynchronous__c, Class__c, Load_Order__c,
@@ -35,8 +35,8 @@ public inherited sharing class ProfilingTestService {
             ORDER BY Load_Order__c];
     }
     /**
-     * queryTriggerHandlerRecords Retrieve the Rollup_mmdt records via SOQL mimicing how it's handled in CRLP
-     * @return   return List<Rollup__mdt>
+     * queryRollupCmdtRecords Retrieve the Rollup_mmdt records via SOQL mimicing how it's handled in CRLP
+     * @return  List<Rollup__mdt>
      */
     public static List<Rollup__mdt> queryRollupCmdtRecords() {
         return [SELECT
@@ -66,8 +66,8 @@ public inherited sharing class ProfilingTestService {
     }
 
     /**
-     * queryTriggerHandlerRecords Retrieve the Data_Import_Field_Mapping__mdt records via SOQL mimicing how it's handled in Gift Entry
-     * @return   return List<Data_Import_Field_Mapping__mdt>
+     * queryDataImportMappings Retrieve the Data_Import_Field_Mapping__mdt records via SOQL mimicing how it's handled in Gift Entry
+     * @return  List<Data_Import_Field_Mapping__mdt>
      */
     public static List<Data_Import_Field_Mapping__mdt> queryDataImportMappings() {
         return [SELECT
@@ -91,6 +91,7 @@ public inherited sharing class ProfilingTestService {
             WHERE Is_Deleted__c = false];
     }
 
+    // Objects to describe
     private static final List<String> objects =  new List<String> {
         'Opportunity', 'Contact', 'Account'
     };

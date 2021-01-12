@@ -29,9 +29,11 @@ The `ProfilingTestServiceController` Apex Class is what defines the tests being 
 
 ## Setup and Configuration (without or NPSP)
 1. Create a new SFDX project for this in Visual Studio Code (or IntelliJ)
-2. Modify the `ProfilingTestServiceController` and `ProfilingTestService` classes locally to remove references to any NPSP custom objects or apex.
+2. Modify the `ProfilingTestServiceController` and `ProfilingTestService` classes locally to remove references to any NPSP custom objects.
 3. Create a new scratch org using the `config/project-scratch-def.json` definition (this enables Platform Cache in the org)
+   - `sfdx force:org:create -f config/project-scratch-def.json -a perftest`
 4. Push the source into the scratch org
+   - `sfdx force:source:push -u perftest`
 
 ## Starting the Tests
 1. Launch the org

@@ -119,14 +119,14 @@ public without sharing class ProfilingTestServiceController {
      * @description Query TriggerHandler__c using SOQL
      */
     private static void triggerHandlerSoql() {
-        Trigger_Handler__c[] results = ProfilingTestService.queryTriggerHandlerRecords();
+        SObject[] results = ProfilingTestService.queryTriggerHandlerRecords();
     }
 
     /**
      * @description Query TriggerHandler__c using the Platform Cache
      */
     private static void triggerHandlerCache() {
-        Trigger_Handler__c[] results = (List<Trigger_Handler__c>)platformCache.orgCache.get(
+        SObject[] results = (List<SObject>)platformCache.orgCache.get(
                 ProfilingTestService.TriggerHandlerCache.class, 'dummy'
             );
     }
@@ -135,14 +135,14 @@ public without sharing class ProfilingTestServiceController {
      * @description Query Rollup__mdt using SOQL
      */
     private static void rollupCmdtSoql(){
-        Rollup__mdt[] results = ProfilingTestService.queryRollupCmdtRecords();
+        SObject[] results = ProfilingTestService.queryRollupCmdtRecords();
     }
 
     /**
      * @description Query Rollup__mdt using the Platform Cache
      */
     private static void rollupCmdtCache(){
-        Rollup__mdt[] results = (List<Rollup__mdt>)platformCache.orgCache.get(
+        SObject[] results = (List<SObject>)platformCache.orgCache.get(
             ProfilingTestService.RollupMetadataCache.class, 'dummy'
         );
     }
@@ -151,14 +151,14 @@ public without sharing class ProfilingTestServiceController {
      * @description Query Data_Import_Field_Mapping__mdt using SOQL
      */
     private static void dataImportMappingsSoql(){
-        Data_Import_Field_Mapping__mdt[] results = ProfilingTestService.queryDataImportMappings();
+        SObject[] results = ProfilingTestService.queryDataImportMappings();
     }
 
     /**
      * @description Query Data_Import_Field_Mapping__mdt using the Platform Cache
      */
     private static void dataImportMappingsCache(){
-        Data_Import_Field_Mapping__mdt[] results = (List<Data_Import_Field_Mapping__mdt>)platformCache.orgCache.get(
+        SObject[] results = (List<SObject>)platformCache.orgCache.get(
             ProfilingTestService.DataImportMappingsCache.class, 'dummy'
         );
     }
