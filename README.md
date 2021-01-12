@@ -10,6 +10,10 @@ The `PerformanceTestServiceController` Apex Class is what defines the tests bein
 2. Clone the NPSP repo locally
 3. Close this repo locally
 
+### NPSP Dependency
+- Using this with NPSP is completely **optional**.
+- It was primariliy built to test certain features that rely on NPSP, however that dependency can be easily removed by changing the tests that execute in the `PerformanceTestServiceController` and `PerformanceTestService` apex classes. 
+
 ## Setup and Configuration
 1. From the NPSP repo, create a new `dev` scratch org and deploy the NPSP Unpackaged Metadata into a Scratch Org
    - `cci org scratch dev perftest`
