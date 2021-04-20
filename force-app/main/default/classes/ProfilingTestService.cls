@@ -161,6 +161,21 @@ public inherited sharing class ProfilingTestService {
             return r;
         }
     }
+    public class RollupGroupingCache implements Cache.CacheBuilder {
+        public List<CRLP_Rollup> doLoad(String rollupType) {
+            CRLP_VRollupHandler virtualHandler = new CRLP_VRollupHandler();
+            switch on (rollupType) {
+                when 'ContactHardCredit' {
+                    virtualHandler.buildGroupedRollups(CRLP_RollupProcessingOptions.RollupType.ContactHardCredit);                    
+                }
+                when 'AccountHardCredit' {
+                    virtualHandler.buildGroupedRollups(CRLP_RollupProcessingOptions.RollupType.AccountHardCredit);                    
+                }
+            }
+            return virtualHandler.getRollupsList();
+        }
+    }
+
     public class DataImportMappingsCache implements Cache.CacheBuilder {
         public List<Data_Import_Field_Mapping__mdt> doLoad(String dummyParam) {
             List<Data_Import_Field_Mapping__mdt> r = queryDataImportMappings();

@@ -22,10 +22,12 @@ public without sharing class ProfilingTestServiceController {
      * The actual tests to perform on the page. See the executeTest() method below to link each test to an apex method.
      * ====================================================================================================================== */
     private static final List<TestConfiguration> testConfig = new List<TestConfiguration>{
-        new TestConfiguration('TriggerHandler', 'TDTM TriggerHandler Query', 'SOQL', 'Platform Cache'),
-        new TestConfiguration('RollupsQuery', 'CRLP Custom MetadataType Query', 'SOQL', 'Platform Cache'),
-        new TestConfiguration('DataImportMapping', 'Data Import Mapping MetadataType Query', 'SOQL', 'Platform Cache'),
-        new TestConfiguration('GlobalDescribeMap', 'getGlobalDescribe', 'Schema', 'Platform Cache (w/o SObjectType)')
+        new TestConfiguration('RollupQuery', 'CRLP Custom MetadataType Query', 'SOQL', 'Platform Cache'),
+        new TestConfiguration('RollupGrouping-ContactHC', 'CRLP Grouping - Contact Hard Credit', 'Apex', 'Platform Cache'),
+        new TestConfiguration('RollupGrouping-AccountHC', 'CRLP Grouping - Account Hard Credit', 'Apex', 'Platform Cache')
+        // new TestConfiguration('DataImportMapping', 'Data Import Mapping MetadataType Query', 'SOQL', 'Platform Cache'),
+        // new TestConfiguration('TriggerHandler', 'TDTM TriggerHandler Query', 'SOQL', 'Platform Cache'),
+        // new TestConfiguration('GlobalDescribeMap', 'getGlobalDescribe', 'Schema', 'Platform Cache (w/o SObjectType)')
     };
 
     /**
@@ -61,30 +63,42 @@ public without sharing class ProfilingTestServiceController {
             Long startTime = (durationCalcMethod != 'cpu' ? System.currentTimeMillis() : 0);
 
             switch on testNameAndMode {
-                when 'TriggerHandler:A' {
-                    triggerHandlerSoql();
-                }
-                when 'TriggerHandler:B' {
-                    triggerHandlerCache();
-                }
-                when 'RollupsQuery:A' {
+                // when 'TriggerHandler:A' {
+                //     triggerHandlerSoql();
+                // }
+                // when 'TriggerHandler:B' {
+                //     triggerHandlerCache();
+                // }
+                when 'RollupQuery:A' {
                     rollupCmdtSoql();
                 }
-                when 'RollupsQuery:B' {
+                when 'RollupQuery:B' {
                     rollupCmdtCache();
                 }
-                when 'DataImportMapping:A' {
-                    dataImportMappingsSoql();
+                when 'RollupGrouping-ContactHC:A' {
+                    crlpGroupingApex(CRLP_RollupProcessingOptions.RollupType.ContactHardCredit);
                 }
-                when 'DataImportMapping:B' {
-                    dataImportMappingsCache();
+                when 'RollupGrouping-ContactHC:B' {
+                    crlpGroupingCache(CRLP_RollupProcessingOptions.RollupType.ContactHardCredit);
                 }
-                when 'GlobalDescribeMap:A' {
-                    describeTestA();
+                when 'RollupGrouping-AccountHC:A' {
+                    crlpGroupingApex(CRLP_RollupProcessingOptions.RollupType.AccountHardCredit);
                 }
-                when 'GlobalDescribeMap:B' {
-                    describeTestB();
+                when 'RollupGrouping-AccountHC:B' {
+                    crlpGroupingCache(CRLP_RollupProcessingOptions.RollupType.AccountHardCredit);
                 }
+                // when 'DataImportMapping:A' {
+                //     dataImportMappingsSoql();
+                // }
+                // when 'DataImportMapping:B' {
+                //     dataImportMappingsCache();
+                // }
+                // when 'GlobalDescribeMap:A' {
+                //     describeTestA();
+                // }
+                // when 'GlobalDescribeMap:B' {
+                //     describeTestB();
+                // }
                 when else {
                     throw new AuraHandledException('Unknown Test Type: ' + testNameAndMode);
                 }
@@ -116,21 +130,21 @@ public without sharing class ProfilingTestServiceController {
     // INDIVIDUAL TESTING METHODS
     // =========================================================================================================
 
-    /*************************************************************************************************
-     * @description Query TriggerHandler__c using SOQL
-     */
-    private static void triggerHandlerSoql() {
-        SObject[] results = ProfilingTestService.queryTriggerHandlerRecords();
-    }
+    // /*************************************************************************************************
+    //  * @description Query TriggerHandler__c using SOQL
+    //  */
+    // private static void triggerHandlerSoql() {
+    //     SObject[] results = ProfilingTestService.queryTriggerHandlerRecords();
+    // }
 
-    /**
-     * @description Query TriggerHandler__c using the Platform Cache
-     */
-    private static void triggerHandlerCache() {
-        SObject[] results = (List<SObject>)ProfilingTestService.platformCache.orgCache.get(
-                ProfilingTestService.TriggerHandlerCache.class, 'dummy'
-            );
-    }
+    // /**
+    //  * @description Query TriggerHandler__c using the Platform Cache
+    //  */
+    // private static void triggerHandlerCache() {
+    //     SObject[] results = (List<SObject>)ProfilingTestService.platformCache.orgCache.get(
+    //             ProfilingTestService.TriggerHandlerCache.class, 'dummy'
+    //         );
+    // }
 
     /*************************************************************************************************
      * @description Query Rollup__mdt using SOQL
@@ -143,41 +157,65 @@ public without sharing class ProfilingTestServiceController {
      * @description Query Rollup__mdt using the Platform Cache
      */
     private static void rollupCmdtCache(){
-        SObject[] results = (List<SObject>)ProfilingTestService.platformCache.orgCache.get(
+        Object jsonResult = ProfilingTestService.platformCache.orgCache.get(
             ProfilingTestService.RollupMetadataCache.class, 'dummy'
         );
+        System.debug('-- Load TriggerHandlerCache Size: ' +  jsonResult.length());
+        
+        SObject[] results = (List<SObject>)jsonResult;
     }
 
     /*************************************************************************************************
-     * @description Query Data_Import_Field_Mapping__mdt using SOQL
+     * @description Query Rollup__mdt using SOQL
      */
-    private static void dataImportMappingsSoql(){
-        SObject[] results = ProfilingTestService.queryDataImportMappings();
+    private static void crlpGroupingApex(CRLP_RollupProcessingOptions.RollupType rollupType) {
+        CRLP_VRollupHandler virtualHandler = new CRLP_VRollupHandler();
+        virtualHandler.buildGroupedRollups(rollupType);
+        List<CRLP_Rollup> groupedRollups = virtualHandler.getRollupsList();
     }
 
     /**
-     * @description Query Data_Import_Field_Mapping__mdt using the Platform Cache
+     * @description Query Rollup__mdt using the Platform Cache
      */
-    private static void dataImportMappingsCache(){
-        SObject[] results = (List<SObject>)ProfilingTestService.platformCache.orgCache.get(
-            ProfilingTestService.DataImportMappingsCache.class, 'dummy'
+    private static void crlpGroupingCache(CRLP_RollupProcessingOptions.RollupType rollupType) {
+        Object jsonResult = ProfilingTestService.platformCache.orgCache.get(
+            ProfilingTestService.RollupGroupingCache.class, rollupType.name()
         );
+        System.debug('-- Load CRLP ' + rollupType.name() + ' Size: ' +  jsonResult.length());
+
+        CRLP_Rollup[] results = (List<CRLP_Rollup>)jsonResult;
     }
 
+    // /*************************************************************************************************
+    //  * @description Query Data_Import_Field_Mapping__mdt using SOQL
+    //  */
+    // private static void dataImportMappingsSoql(){
+    //     SObject[] results = ProfilingTestService.queryDataImportMappings();
+    // }
 
-    /*************************************************************************************************
-     * @description Test using SObjectDescribe with the default (full) behavior
-     */
-    private static void describeTestA() {
-        ProfilingTestService.getGlobalDescribe();
-    }
+    // /**
+    //  * @description Query Data_Import_Field_Mapping__mdt using the Platform Cache
+    //  */
+    // private static void dataImportMappingsCache(){
+    //     SObject[] results = (List<SObject>)ProfilingTestService.platformCache.orgCache.get(
+    //         ProfilingTestService.DataImportMappingsCache.class, 'dummy'
+    //     );
+    // }
 
-    /**
-     * @description Test using SObectDescribe using the new Deferred behavior
-     */
-    private static void describeTestB() {
-        ProfilingTestService.getGlobalDescribeCached();
-    }
+
+    // /*************************************************************************************************
+    //  * @description Test using SObjectDescribe with the default (full) behavior
+    //  */
+    // private static void describeTestA() {
+    //     ProfilingTestService.getGlobalDescribe();
+    // }
+
+    // /**
+    //  * @description Test using SObectDescribe using the new Deferred behavior
+    //  */
+    // private static void describeTestB() {
+    //     ProfilingTestService.getGlobalDescribeCached();
+    // }
 
 
     // ===========================================================================================
